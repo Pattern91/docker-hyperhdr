@@ -1,35 +1,19 @@
-# docker-hyperdr
+# docker-hyperdr for Raspberry Pi and Portainer
+
+The idea behind this fork is to use Portainer which is running on a Raspberry Pi which is not only used for HyperHDR.
+I also use it for HomeAssistant and therefore needed a docker solution of HyperHDR.
+
+Hopefully i can keep it up to date!
 
 ## Overview
 Uses [Awawa's HDR edit for hyperion-ng](https://github.com/awawa-dev/HyperHDR/releases) to create docker image
 
+Forked from user pewter77(https://github.com/pewter77/docker-hyperhdr) (thanks a lot!)
+
 Requires host OS to have drivers (DVB or otherwise) to pick up the device and share it to docker, it has been tested and working on Unraid with 6.9 rc2 w/ DVB plugins using openelec drivers and a USB grabber. Others most likely won't be tested right now.
 
-Possible future (because it's already working for me and not sure if I want to go further)
-1. Home Assistant Add-on
-2. Docker Hub upload with multi-architecture support
+Uses a self compiled docker image created from the HyperHDR Release branch. 
 
-## Running
-- Clone repo 
-- Build docker image 
-  ```
-  docker build -t hyper-hdr .
-  ```
-- Run the container
-  ```bash
-  docker run -d \
-    --name=hyperhdr \
-    -e PUID=1000 \
-    -e PGID=1000 \
-    -e TZ=Europe/London \
-    -e UMASK_SET=022 `#optional` \
-    -p=8090:8090 \
-    -p=19445:19445 \
-    -p=19444:19444 \
-    -v /path/to/data:/config \
-    --restart=unless-stopped \
-    hyper-hdr
-  ```
 - Docker-Compose Example (This is what I use on Unraid)
   ```
   ---
@@ -40,7 +24,7 @@ Possible future (because it's already working for me and not sure if I want to g
     hyper-hdr:
       container_name: hyper-hdr
       hostname: hyper-hdr
-      image: hyper-hdr:latest
+      image: nemesis91/hyperhdrv17:armv7
       devices:
         - /dev/video0
       ports:
@@ -50,12 +34,12 @@ Possible future (because it's already working for me and not sure if I want to g
       environment:
         - PUID=99
         - PGID=100
-        - TZ=Europe/London
+        - TZ=Europe/Berlin
       volumes:
-        - path/to/appdata/hyper-hdr:/config
+        - ./hyper-hdr:/config
       restart: unless-stopped
   ```
 
-Originally based on https://github.com/malalam/docker-hyper-hdr so big thanks to malalam
+Originally based on https://github.com/malalam/docker-hyper-hdr
 Lots of re-used images from linuxserver.io as well in an attempt to keep everything normalized and learn what they're using!
 
