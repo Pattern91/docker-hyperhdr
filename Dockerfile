@@ -1,32 +1,22 @@
-FROM lsiobase/ubuntu:focal
+FROM multiarch/qemu-user-static:arm as qemu
+FROM arm32v7/debian:10.6-slim
+COPY --from=qemu /usr/bin/qemu-arm-static /usr/bin
 
-ARG DEBIAN_FRONTEND="noninteractive"
-ARG HYPERHDR_URL="https://github.com/awawa-dev/HyperHDR/releases/download"
-ARG HYPERHDR_VERSION="17.0.0.0"
-ARG ARCH="x86_64"
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -y install --no-install-recommends git cmake build-essential \
+    libasound2-dev qtbase5-dev libqt5serialport5-dev libqt5sql5-sqlite libqt5svg5-dev libqt5x11extras5-dev libusb-1.0-0-dev \
+    python3-minimal rpm libcec-dev libxcb-image0-dev libxcb-util0-dev libxcb-shm0-dev libglvnd-dev \
+    libxcb-render0-dev libxcb-randr0-dev libxrandr-dev libxrender-dev libavahi-core-dev libavahi-compat-libdnssd-dev \
+    libjpeg-dev libturbojpeg0-dev libssl-dev zlib1g-dev ca-certificates curl wget dialog apt-utils \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
-#RUN sed -i "s/archive.ubuntu./mirrors.aliyun./g" /etc/apt/sources.list
-#RUN sed -i "s/deb.debian.org/mirrors.aliyun.com/g" /etc/apt/sources.list
-#RUN sed -i "s/security.debian.org/mirrors.aliyun.com\/debian-security/g" /etc/apt/sources.list
+RUN wget https://github.com/awawa-dev/HyperHDR/releases/download/v17.0.0.0/HyperHDR-17.0.0.0-Linux-armv7l.deb
+RUN apt-get install -y ./HyperHDR-17.0.0.0-Linux-armv7l.deb
 
-RUN \
- echo "**** install packages ****" && \
- apt-get update && \
- apt-get install -y --no-install-recommends \
- #           wget xz-utils libusb-1.0-0 libexpat1 libglu1-mesa libglib2.0-0 libfreetype6 && \
-			 wget libglu1-mesa && \
- echo "**** install HyperHDR ****" && \
- wget -O /tmp/hyperhdr.deb ${HYPERHDR_URL}/v${HYPERHDR_VERSION}/HyperHDR-${HYPERHDR_VERSION}-Linux-${ARCH}.deb && \
- apt install -y ./tmp/hyperhdr.deb && \
- echo "**** cleanup ****" && \
- rm -rf \
-	/tmp/* \
-	/var/lib/apt/lists/* \
-	/var/tmp/*
+RUN rm HyperHDR-17.0.0.0-Linux-armv7l.deb
 
-# add local files
-COPY root/ /
-
-# ports and volumes
 EXPOSE 8090 19444 19445
-VOLUME /config
+
+RUN echo 'Running webUIon port 8090. Port 19444-19445 exposed for json, protobuffer server (hyperion-screen-cap)'
+
+CMD ["hyperhdr"]
