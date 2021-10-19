@@ -12,7 +12,7 @@ Forked from user pewter77(https://github.com/pewter77/docker-hyperhdr) (thanks a
 
 Requires host OS to have drivers (DVB or otherwise) to pick up the device and share it to docker, it has been tested and working on Unraid with 6.9 rc2 w/ DVB plugins using openelec drivers and a USB grabber. Others most likely won't be tested right now.
 
-Uses a self compiled docker image created from the HyperHDR Release branch. 
+Uses a self compiled docker image created from the HyperHDR Release branch. The docker image vor arm-v71 can be found on docker hub (nemesis91/hyperhdrv17).
 
 - Docker-Compose Example (This is what I use on Unraid)
   ```
